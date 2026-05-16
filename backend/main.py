@@ -27,20 +27,22 @@ app = FastAPI(
 )
 
 # ── CORS ──────────────────────────────────────────────────────────────
-# Allow the Vite dev server (port 5173) and any localhost variant.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        # Local development
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+
+        # Railway frontend deployment
+        "https://alert-essence-production-07b8.up.railway.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # ── Request schema ────────────────────────────────────────────────────
 class AnalyzeRequest(BaseModel):
@@ -51,24 +53,32 @@ class AnalyzeRequest(BaseModel):
     @classmethod
     def validate_test_id(cls, v: str) -> str:
         valid = set(NOISE_MAP.keys())
+
         if v not in valid:
-            raise ValueError(f"test_id must be one of {sorted(valid)}")
+            raise ValueError(
+                f"test_id must be one of {sorted(valid)}"
+            )
+
         return v
 
     @field_validator("filter_type")
     @classmethod
     def validate_filter_type(cls, v: str) -> str:
         valid = {"fir", "butterworth", "chebyshev"}
-        if v.lower() not in valid:
-            raise ValueError(f"filter_type must be one of {sorted(valid)}")
-        return v.lower()
 
+        if v.lower() not in valid:
+            raise ValueError(
+                f"filter_type must be one of {sorted(valid)}"
+            )
+
+        return v.lower()
 
 # ── Endpoints ─────────────────────────────────────────────────────────
 
 @app.get("/", tags=["Health"])
 def root():
     """Health check — confirms the API is running."""
+
     return {
         "status": "ok",
         "message": "ECG Test Lab API is running",
@@ -79,10 +89,11 @@ def root():
 @app.get("/tests", tags=["Meta"])
 def list_tests():
     """Return the list of available ECG test signals."""
+
     return [
         {
-            "id":         test_id,
-            "label":      f"Test {test_id[-1]}",
+            "id": test_id,
+            "label": f"Test {test_id[-1]}",
             "noise_type": noise,
         }
         for test_id, noise in NOISE_MAP.items()
@@ -92,6 +103,7 @@ def list_tests():
 @app.get("/filters", tags=["Meta"])
 def list_filters():
     """Return the list of available filter families with descriptions."""
+
     return [
         {"id": k, "description": v}
         for k, v in FILTER_INFO.items()
@@ -110,14 +122,26 @@ def analyze(request: AnalyzeRequest):
     Returns a JSON object with signal arrays, metrics, PSD, FFT,
     spectrogram, and R-peak data ready for Plotly visualisation.
     """
+
     try:
-        return analyze_ecg(request.test_id, request.filter_type)
+        return analyze_ecg(
+            request.test_id,
+            request.filter_type
+        )
+
     except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc)
+        ) from exc
+
     except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc)
+        ) from exc
+
     except Exception as exc:
-        # Friendly error message for classroom demos
         raise HTTPException(
             status_code=500,
             detail=f"DSP analysis failed: {type(exc).__name__}: {exc}",
