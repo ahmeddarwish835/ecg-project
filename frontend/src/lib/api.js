@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8020';
+const API_URL = 'https://ecg-project-production.up.railway.app';
 
 export async function analyzeEcg(testId, filterType) {
     const res = await fetch(`${API_URL}/analyze`, {
