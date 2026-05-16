@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ──────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    background: #060d1a;
+    color: #e2e8f0;
+    min-height: 100dvh;
+  }
+
+  select, button { outline: none; }
+  select { -webkit-appearance: none; appearance: none; cursor: pointer; }
+}
+
+/* ── Components ─────────────────────────────────────────── */
+@layer components {
+
+  /* Glass card */
+  .glass {
+    background: rgba(13, 20, 38, 0.78);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.4),
+      0 24px 48px rgba(2, 6, 23, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  }
+
+  /* Glowing border on hover */
+  .glass-hover {
+    @apply glass transition-all duration-300;
+  }
+  .glass-hover:hover {
+    border-color: rgba(0, 200, 240, 0.28);
+    box-shadow:
+      0 0 0 1px rgba(0, 200, 240, 0.12),
+      0 24px 48px rgba(2, 6, 23, 0.5),
+      0 0 32px rgba(0, 200, 240, 0.06);
+  }
+
+  /* Stat card gradient badge */
+  .badge-glow {
+    background: linear-gradient(135deg, rgba(0, 200, 240, 0.15), rgba(99, 102, 241, 0.1));
+    border: 1px solid rgba(0, 200, 240, 0.2);
+    box-shadow: 0 0 20px rgba(0, 200, 240, 0.08);
+  }
+
+  /* Custom select wrapper */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #94a3b8;
+    pointer-events: none;
+  }
+
+  /* Animated ECG line in header */
+  .ecg-line {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: ecg-draw 2s ease-in-out infinite;
+  }
+  @keyframes ecg-draw {
+    0%   { stroke-dashoffset: 200; opacity: 1; }
+    70%  { stroke-dashoffset: 0;   opacity: 1; }
+    90%  { stroke-dashoffset: 0;   opacity: 0.4; }
+    100% { stroke-dashoffset: 200; opacity: 0; }
+  }
+
+  /* Pulse dot */
+  .pulse-dot {
+    position: relative;
+  }
+  .pulse-dot::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+  ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); }
+
+  /* Plotly container */
+  .plot-container .plotly { width: 100% !important; }
+  .js-plotly-plot { width: 100% !important; }
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #00c8f0 0%, #818cf8 50%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-warm {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gradient {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .animate-fade-in { animation: fadeIn 0.4s ease-in-out; }
+  .animate-slide-up { animation: slideUp 0.35s ease-out; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(14px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+}
